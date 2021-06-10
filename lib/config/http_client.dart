@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:controle_app/config/http_logging_interceptor.dart';
 import 'package:http/http.dart';
 import 'package:http_interceptor/http_client_with_interceptor.dart';
 
@@ -15,28 +16,24 @@ Map<String, String> defaultHeaders() {
   return headers;
 }
 
-String controleUri(String path, {Map<String, dynamic>? params}) {
+Uri controleApiUri(String path, {Map<String, dynamic>? params}) {
   return Uri(
     scheme: 'http',
     host: 'localhost',
+    port: 3000,
     path: path,
     queryParameters: params,
-  ).toString();
+  );
 }
 
-final Client oticketHttpClient = HttpClientWithInterceptor.build(
+final Client httpClient = HttpClientWithInterceptor.build(
   interceptors: [
-    // HttpLoggingInterceptor(),
+    HttpLoggingInterceptor(),
   ],
   requestTimeout: Duration(seconds: 5),
   // badCertificateCallback: (cert, host, port) => true,
 );
 
-// dynamic jsonDecodeUtf8(
-//   List<int> codeUnits, {
-//   Object reviver(Object key, Object value),
-// }) =>
-//     json.decode(
-//       utf8.decode(codeUnits),
-//       reviver: reviver,
-//     );
+dynamic jsonDecodeUtf8(List<int> codeUnits) {
+  return json.decode(utf8.decode(codeUnits));
+}
