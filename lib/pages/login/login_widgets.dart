@@ -1,18 +1,17 @@
-import 'package:controle_app/services/controle_api.dart';
+import 'package:controle_app/pages/login/login_store.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
-
-  @override
-  _LoginPageState createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  String email = '', password = '';
+class LoginPage extends StatelessWidget {
+  final store = LoginStore();
 
   @override
   Widget build(BuildContext context) {
+    print(store.failure?.message?.isNotEmpty ?? false);
+    final theme = Theme.of(context);
+    final errorTextStyle = theme.textTheme.subtitle1?.copyWith(
+      color: theme.errorColor,
+    );
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       body: Center(
@@ -21,42 +20,47 @@ class _LoginPageState extends State<LoginPage> {
           child: Card(
             child: Padding(
               padding: EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    decoration: InputDecoration(labelText: 'E-mail'),
-                    onChanged: (val) => email = val,
-                    keyboardType: TextInputType.emailAddress,
+              child: Form(
+                child: Observer(
+                  builder: (_) => Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        decoration: InputDecoration(
+                          labelText: 'E-mail',
+                          errorText:
+                              store.isEmailInvalid ? 'E-mail inválido' : null,
+                        ),
+                        onChanged: (val) => store.email = val,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      TextField(
+                        decoration: InputDecoration(
+                          labelText: 'Senha',
+                          errorText: store.isPasswordInvalid
+                              ? 'Senha muito curta'
+                              : null,
+                        ),
+                        obscureText: true,
+                        onChanged: (val) => store.password = val,
+                      ),
+                      SizedBox(height: 16),
+                      if (store.failure?.message?.isNotEmpty ?? false)
+                        Text(
+                          store.failure!.message!,
+                          style: errorTextStyle,
+                        ),
+                      SizedBox(height: 16),
+                      Container(
+                        width: double.maxFinite,
+                        child: ElevatedButton(
+                          onPressed: store.doLogin,
+                          child: Text('Entrar'),
+                        ),
+                      )
+                    ],
                   ),
-                  TextField(
-                    decoration: InputDecoration(labelText: 'Senha'),
-                    obscureText: true,
-                    onChanged: (val) => password = val,
-                  ),
-                  SizedBox(height: 16),
-                  Container(
-                    width: double.maxFinite,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        print(email);
-                        print(password);
-                        if (email != '' && password != '') {
-                          try {
-                            final token = await ControleApi.login(
-                              username: email,
-                              password: password,
-                            );
-                            print(token.access);
-                          } catch (e) {
-                            print(e);
-                          }
-                        }
-                      },
-                      child: Text('Entrar'),
-                    ),
-                  )
-                ],
+                ),
               ),
             ),
           ),
