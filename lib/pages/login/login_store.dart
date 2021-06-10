@@ -8,7 +8,7 @@ class LoginStore = LoginStoreBase with _$LoginStore;
 
 abstract class LoginStoreBase with Store {
   @observable
-  bool loading = false;
+  bool loading = true;
 
   @observable
   String? email;
@@ -24,6 +24,11 @@ abstract class LoginStoreBase with Store {
 
   @observable
   Failure? failure;
+
+  @action
+  Future<void> checkLoggedUser() async {
+    loading = true;
+  }
 
   @action
   Future<void> doLogin() async {

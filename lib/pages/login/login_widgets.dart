@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
 class LoginPage extends StatelessWidget {
-  final store = LoginStore();
+  final store = LoginStore()..checkLoggedUser();
 
   @override
   Widget build(BuildContext context) {
@@ -22,44 +22,52 @@ class LoginPage extends StatelessWidget {
               padding: EdgeInsets.all(16),
               child: Form(
                 child: Observer(
-                  builder: (_) => Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextField(
-                        decoration: InputDecoration(
-                          labelText: 'E-mail',
-                          errorText:
-                              store.isEmailInvalid ? 'E-mail inválido' : null,
+                  builder: (_) {
+                    if (store.loading) {
+                      return Column(mainAxisSize: MainAxisSize.min, children: [
+                        CircularProgressIndicator(),
+                        Text('Fazendo login'),
+                      ]);
+                    }
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          decoration: InputDecoration(
+                            labelText: 'E-mail',
+                            errorText:
+                                store.isEmailInvalid ? 'E-mail inválido' : null,
+                          ),
+                          onChanged: (val) => store.email = val,
+                          keyboardType: TextInputType.emailAddress,
                         ),
-                        onChanged: (val) => store.email = val,
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      TextField(
-                        decoration: InputDecoration(
-                          labelText: 'Senha',
-                          errorText: store.isPasswordInvalid
-                              ? 'Senha muito curta'
-                              : null,
+                        TextField(
+                          decoration: InputDecoration(
+                            labelText: 'Senha',
+                            errorText: store.isPasswordInvalid
+                                ? 'Senha muito curta'
+                                : null,
+                          ),
+                          obscureText: true,
+                          onChanged: (val) => store.password = val,
                         ),
-                        obscureText: true,
-                        onChanged: (val) => store.password = val,
-                      ),
-                      SizedBox(height: 16),
-                      if (store.failure?.message?.isNotEmpty ?? false)
-                        Text(
-                          store.failure!.message!,
-                          style: errorTextStyle,
-                        ),
-                      SizedBox(height: 16),
-                      Container(
-                        width: double.maxFinite,
-                        child: ElevatedButton(
-                          onPressed: store.doLogin,
-                          child: Text('Entrar'),
-                        ),
-                      )
-                    ],
-                  ),
+                        SizedBox(height: 16),
+                        if (store.failure?.message?.isNotEmpty ?? false)
+                          Text(
+                            store.failure!.message!,
+                            style: errorTextStyle,
+                          ),
+                        SizedBox(height: 16),
+                        Container(
+                          width: double.maxFinite,
+                          child: ElevatedButton(
+                            onPressed: store.doLogin,
+                            child: Text('Entrar'),
+                          ),
+                        )
+                      ],
+                    );
+                  },
                 ),
               ),
             ),

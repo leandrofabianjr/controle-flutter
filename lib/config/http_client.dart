@@ -4,13 +4,12 @@ import 'package:controle_app/config/http_logging_interceptor.dart';
 import 'package:http/http.dart';
 import 'package:http_interceptor/http_client_with_interceptor.dart';
 
-Map<String, String> defaultHeaders() {
-  final String? token = '';
+Map<String, String> defaultHeaders({String? token}) {
   Map<String, String> headers = {
     "Accept": "application/json",
     "Content-Type": "application/json"
   };
-  if (token != null && token != '') {
+  if (token != null) {
     headers['Authorization'] = 'Bearer $token';
   }
   return headers;

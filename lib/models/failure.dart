@@ -14,3 +14,5 @@ class Failure implements Exception {
     return Failure(message: 'Houve um problema inesperado');
   }
 }
+
+class UnauthorizedFailure extends Failure {}
